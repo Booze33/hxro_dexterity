@@ -16,18 +16,39 @@ export const FundingTrader: FC = () => {
     const [withdrawStatus, setWithdrawStatus] = useState<'idle' | 'processing' | 'success' | 'failed'>('idle');
 
     const handleDeposit = useCallback(async () => {
-        if (!amount || !publicKey || !manifest) return;
-        try {
+      if (!amount || !publicKey || !manifest) return;
+      try {
 
-          // Deposit
+        setIsLoading(true);
+        setDepositStatus('processing');
+        await trader.deposit(dexterity.Fractional.New(amount, 0), null);
 
-        } catch (error: any) {
-            setDepositStatus('failed');
-            notify({ type: 'error', message: 'Deposit failed!', description: error?.message });
-        } finally {
-            setIsLoading(false);
-        }
-    }, [amount, publicKey, manifest, trader, selectedProduct]);
+      } catch (error: any) {
+          setDepositStatus('failed');
+          notify({ type: 'error', message: 'Deposit failed!', description: error?.message });
+      } finally {
+          setDepositStatus('success')
+          setIsLoading(false);
+      }
+  }, [amount, publicKey, manifest, trader, selectedProduct]);
+
+const handleWithdraw = useCallback(async () => {
+      if (!amount || !publicKey || !manifest) return;
+      try {
+
+        setIsLoading(true);
+        setWithdrawStatus('processing');
+        await trader.withdraw(dexterity.Fractional.New(amount, 0));
+
+      } catch (error: any) {
+          setWithdrawStatus('failed');
+          notify({ type: 'error', message: 'Withdrawal failed!', description: error?.message });
+      } finally {
+          setWithdrawStatus('success')
+          setIsLoading(false);
+      }
+
+  }, [amount, publicKey, manifest, trader, selectedProduct]);
 
     const handleWithdraw = useCallback(async () => {
         if (!amount || !publicKey || !manifest) return;
